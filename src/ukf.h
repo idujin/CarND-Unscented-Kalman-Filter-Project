@@ -68,6 +68,7 @@ public:
   double lambda_;
 
 
+
   /**
    * Constructor
    */
@@ -89,19 +90,92 @@ public:
    * matrix
    * @param delta_t Time between k and k+1 in s
    */
-  void Prediction(double delta_t);
+  void Prediction( MatrixXd* Xsig_pred_out,
+                      VectorXd x,
+                      MatrixXd P,
+                      const double std_a, 
+                      const double std_yawdd,
+                      double delta_t);
 
   /**
    * Updates the state and the state covariance matrix using a laser measurement
    * @param meas_package The measurement at k+1
    */
-  void UpdateLidar(MeasurementPackage meas_package);
-
+  
   /**
    * Updates the state and the state covariance matrix using a radar measurement
    * @param meas_package The measurement at k+1
    */
-  void UpdateRadar(MeasurementPackage meas_package);
+  
+
+  VectorXd ComputeWeights();
+  void PredictMeanAndCovariance(
+                                VectorXd* x_out,
+                                MatrixXd* P_out,
+                                MatrixXd Xsig_pred,
+                                VectorXd weights);
+  MatrixXd AugmentedSigmaPoints(VectorXd x,
+                                MatrixXd P,
+                                const double std_a, 
+                                const double std_yawdd);
+  MatrixXd PredictSigmaPoints(MatrixXd Xsig_aug,
+                                 const double delta_t);
+  void PredictRadarMeasurement(
+                                  MatrixXd* S_out,
+                                  MatrixXd* Zsig_out,
+                                  VectorXd* z_pred_out,
+                                  MatrixXd Xsig_pred,
+                                  VectorXd weights,
+                                  const double std_radr,
+                                  const double std_radphi,
+                                  const double stdradrd);
+  void PredictLidarMeasurement(MatrixXd* S_out,
+                                  MatrixXd* Zsig_out,
+                                  VectorXd* z_pred_out,
+                                  MatrixXd Xsig_pred,
+                                  VectorXd weights,
+                                  const double std_laspx,
+                                  const double std_laspy);
+  void UpdateStateRadar(VectorXd* x_out, 
+                          MatrixXd* P_out,
+                          VectorXd z,
+                          MatrixXd Zsig,
+                          VectorXd z_pred,
+                          MatrixXd Xsig_pred,
+                          VectorXd x,
+                          MatrixXd S,
+                          MatrixXd P,
+                          VectorXd weights
+                          );
+  void UpdateStateLidar(VectorXd* x_out, 
+                          MatrixXd* P_out,
+                          VectorXd z,
+                          MatrixXd Zsig,
+                          VectorXd z_pred,
+                          MatrixXd Xsig_pred,
+                          VectorXd x,
+                          MatrixXd S,
+                          MatrixXd P,
+                          VectorXd weights
+                          );
+  void UpdateLidar(
+                  VectorXd* x,
+                  MatrixXd* P,
+                  MeasurementPackage meas_package,
+                  MatrixXd Xsig_pred,
+                  VectorXd weights,
+                  const double std_laspx,
+                  const double std_laspy);
+
+  void UpdateRadar(
+                  VectorXd* x,
+                  MatrixXd* P,
+                  MeasurementPackage meas_package,
+                  MatrixXd Xsig_pred,
+                  VectorXd weights,
+                  const double std_radr,
+                  const double std_radphi,
+                  const double stdradrd); 
 };
 
 #endif /* UKF_H */
