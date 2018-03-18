@@ -91,8 +91,9 @@ public:
    * @param delta_t Time between k and k+1 in s
    */
   void Prediction( MatrixXd* Xsig_pred_out,
-                      VectorXd x,
-                      MatrixXd P,
+                      VectorXd* x,
+                      MatrixXd* P,
+                      VectorXd weights,
                       const double std_a, 
                       const double std_yawdd,
                       double delta_t);
